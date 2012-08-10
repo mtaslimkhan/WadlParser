@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.8.2
+Created-By: build 1.6.0_33-b04 (Sun Microsystems Inc.)
+Built-By: bjggzxb
+Class-Path: jdom-2.0.2.jar relaxngDatatype-1.0.jar xsom-20081112.jar
