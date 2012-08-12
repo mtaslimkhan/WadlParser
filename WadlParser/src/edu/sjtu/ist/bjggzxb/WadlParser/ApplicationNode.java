@@ -17,6 +17,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.jdom2.Namespace;
+
 /*
  * Here we don't parse grammars node
  */
@@ -28,7 +30,7 @@ public class ApplicationNode extends GenericNode {
 	private List<MethodNode> methodNodes;
 	private List<RepresentationNode> representationNodes;
 	private List<ParamNode> paramNodes;
-	private List<NamespaceAttribute> namespaceAttributes;
+	private List<Namespace> namespaceAttributes;
 
 	public ApplicationNode() {
 		docNodes = new ArrayList<DocNode>();
@@ -37,7 +39,7 @@ public class ApplicationNode extends GenericNode {
 		methodNodes = new ArrayList<MethodNode>();
 		representationNodes = new ArrayList<RepresentationNode>();
 		paramNodes = new ArrayList<ParamNode>();
-		namespaceAttributes = new ArrayList<NamespaceAttribute>();
+		namespaceAttributes = new ArrayList<Namespace>();
 	}
 
 	protected boolean addResources(ResourcesNode resources) {
@@ -52,27 +54,25 @@ public class ApplicationNode extends GenericNode {
 		return resourcesNodes;
 	}
 
-	protected boolean addNamespace(NamespaceAttribute namespace) {
-		if (namespace.isValid() && namespaceAttributes.contains(namespace))
-			return false;
-		namespaceAttributes.add(namespace);
+	protected boolean setNamespace(List<Namespace> namespaces) {
+		this.namespaceAttributes = namespaces;
 		return true;
 	}
 
 	public String getNamespaceByName(String name) {
 		if (name == null)
 			return null;
-		Iterator<NamespaceAttribute> iter = namespaceAttributes.iterator();
+		Iterator<Namespace> iter = namespaceAttributes.iterator();
 		while (iter.hasNext()) {
-			NamespaceAttribute attribute = iter.next();
-			if (name.equals(attribute.getName())) {
-				return attribute.getValue();
+			Namespace nm = iter.next();
+			if (nm.getPrefix().equals(name)) {
+				return nm.getURI();
 			}
 		}
 		return null;
 	}
 
-	public List<NamespaceAttribute> getAllNamespaces() {
+	public List<Namespace> getAllNamespaces() {
 		return namespaceAttributes;
 	}
 

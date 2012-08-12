@@ -65,19 +65,27 @@ public class WadlParser {
 			System.out.println("Document namespace not defined.");
 			// return "Document namespace not defined.";
 		}
-		Iterator<Attribute> attIter = appAttributes.iterator();
-		while (attIter.hasNext()) {
-			Attribute attri = attIter.next();
-			String name = attri.getName();
-			String value = attri.getValue();
-			if (name.equals(WadlXML.application_xmlns)
-					|| name.equals(WadlXML.application_xmlns_xsd)
-					|| name.equals(WadlXML.application_xmlns_xsi)
-					|| name.equals(WadlXML.application_xsi_schemaLocation)
-					|| name.startsWith(WadlXML.application_xmlns_extNs)) {
-				application.addNamespace(new NamespaceAttribute(name, value));
-			}
-		}
+		application.setNamespace(root.getAdditionalNamespaces());
+		
+		/*
+		 * This part is wrong code
+		 */
+		
+		// Iterator<Attribute> attIter = appAttributes.iterator();
+		// while (attIter.hasNext()) {
+		// Attribute attri = attIter.next();
+		// String name = attri.getName();
+		// String value = attri.getValue();
+		// if (name.equals(WadlXML.application_xmlns)
+		// || name.equals(WadlXML.application_xmlns_xsd)
+		// || name.equals(WadlXML.application_xmlns_xsi)
+		// || name.equals(WadlXML.application_xsi_schemaLocation)
+		// || name.startsWith(WadlXML.application_xmlns_extNs)) {
+		// application.addNamespace(new NamespaceAttribute(name, value));
+		// }
+		// }
+		
+		
 		List<Element> elements = root.getChildren();
 		System.out.println("Get " + elements.size() + " Elements");
 		if (elements.size() == 0)

@@ -56,6 +56,9 @@ import java.util.Iterator;
 
 public class ResourceNode extends GenericNode {
 
+	/*
+	 * attributes from defination of wadl
+	 */
 	private List<DocNode> docNodes = new ArrayList<DocNode>();
 	private List<ParamNode> paramNodes = new ArrayList<ParamNode>();
 	private List<MethodNode> methodNodes = new ArrayList<MethodNode>();
@@ -65,11 +68,23 @@ public class ResourceNode extends GenericNode {
 	private String id;
 	private String type;
 	private String queryType;
+
+	/*
+	 * these two attributes are info about full path resource
+	 */
 	private String absolutePath;
-	
+	private List<ParamNode> parentParams = new ArrayList<ParamNode>();
+
+	/*
+	 * doc attributes
+	 */
 	private String miniDes;
 	private String des;
 	private String name;
+
+	/*
+	 * other
+	 */
 	private int hashCode;
 	private String provider;
 
@@ -88,8 +103,10 @@ public class ResourceNode extends GenericNode {
 		absolutePath = path;
 		ResourceNode iter = this;
 		while (iter.getParentNode() instanceof ResourceNode) {
-			String parentPath = ((ResourceNode) iter.getParentNode()).getPath();
+			ResourceNode resource = (ResourceNode) iter.getParentNode();
+			String parentPath = resource.getPath();
 			absolutePath = parentPath + absolutePath;
+			parentParams.addAll(0, resource.getAllParams());
 			iter = (ResourceNode) iter.getParentNode();
 		}
 		if (iter.getParentNode() instanceof ResourcesNode) {
@@ -112,15 +129,15 @@ public class ResourceNode extends GenericNode {
 				name = path.substring(path.lastIndexOf("/") + 1);
 			} catch (Exception e) {
 			}
-		}else{
+		} else {
 			Iterator<DocNode> iter = docNodes.iterator();
-			while(iter.hasNext()){
+			while (iter.hasNext()) {
 				DocNode doc = iter.next();
-				if(doc.getTitle().equalsIgnoreCase("name"))
+				if (doc.getTitle().equalsIgnoreCase("name"))
 					name = doc.getText();
-				else if(doc.getTitle().equalsIgnoreCase("minidescription"))
+				else if (doc.getTitle().equalsIgnoreCase("minidescription"))
 					miniDes = doc.getText();
-				else if(doc.getTitle().equalsIgnoreCase("description"))
+				else if (doc.getTitle().equalsIgnoreCase("description"))
 					des = doc.getText();
 			}
 		}
@@ -137,19 +154,19 @@ public class ResourceNode extends GenericNode {
 	public String getName() {
 		return name;
 	}
-	
-	public String getMiniDes(){
+
+	public String getMiniDes() {
 		return miniDes;
 	}
-	
-	public String getDes(){
+
+	public String getDes() {
 		return des;
 	}
 
 	public String getPath() {
 		return path;
 	}
-	
+
 	public String getAbsolutePath() {
 		return absolutePath;
 	}
@@ -206,7 +223,7 @@ public class ResourceNode extends GenericNode {
 	public List<ResourceTypeNode> getAllResourceTypes() {
 		return resourceTypeNodes;
 	}
-	
+
 	public String getType() {
 		return type;
 	}
@@ -253,10 +270,15 @@ public class ResourceNode extends GenericNode {
 		return paramNodes;
 	}
 
+	public List<ParamNode> getParentParams() {
+		return parentParams;
+	}
+
 	@Override
 	protected boolean addParam(ParamNode param) {
 		if (!paramNodes.contains(param)) {
 			paramNodes.add(param);
+			parentParams.add(param);
 			return true;
 		}
 		return false;

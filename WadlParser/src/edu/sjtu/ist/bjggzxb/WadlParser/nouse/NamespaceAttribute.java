@@ -1,4 +1,4 @@
-package edu.sjtu.ist.bjggzxb.WadlParser;
+package edu.sjtu.ist.bjggzxb.WadlParser.nouse;
 
 public class NamespaceAttribute {
 
