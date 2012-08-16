@@ -17,19 +17,24 @@
 	        Specifies a HTTP header for use in the request
  */
 
-package edu.sjtu.ist.bjggzxb.WadlParser;
+package edu.sjtu.ist.bjggzxb.WadlParser.impl;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
-public class RequestNode extends GenericNode {
+import edu.sjtu.ist.bjggzxb.WadlParser.core.DocNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ParamNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.RepresentationNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.RequestNode;
+
+public class RequestNodeImpl extends GenericNodeImpl implements RequestNode{
 
 	private List<DocNode> docNodes = new ArrayList<DocNode>();
 	private List<ParamNode> paramNodes = new ArrayList<ParamNode>();
 	private List<RepresentationNode> representationNodes = new ArrayList<RepresentationNode>();
 
-	public RequestNode(MethodNode method) {
+	public RequestNodeImpl(MethodNodeImpl method) {
 		super.parentNode = method;
 	}
 
@@ -42,6 +47,7 @@ public class RequestNode extends GenericNode {
 		return false;
 	}
 
+	@Override
 	public List<DocNode> getAllDocs() {
 		return this.docNodes;
 	}
@@ -55,6 +61,7 @@ public class RequestNode extends GenericNode {
 		return false;
 	}
 
+	@Override
 	public List<ParamNode> getAllParams() {
 		return paramNodes;
 	}
@@ -68,14 +75,15 @@ public class RequestNode extends GenericNode {
 		return false;
 	}
 
+	@Override
 	public List<RepresentationNode> getAllRepresentations() {
 		return representationNodes;
 	}
 
 	@Override
 	public boolean equals(Object other) {
-		if (other instanceof RequestNode) {
-			RequestNode request = (RequestNode) other;
+		if (other instanceof RequestNodeImpl) {
+			RequestNodeImpl request = (RequestNodeImpl) other;
 			if (paramNodes.size() != request.getAllParams().size()
 					|| representationNodes.size() != request
 							.getAllRepresentations().size())

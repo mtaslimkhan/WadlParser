@@ -1,11 +1,10 @@
-package edu.sjtu.ist.bjggzxb.WadlParser;
+package edu.sjtu.ist.bjggzxb.WadlParser.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 
-import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
@@ -15,16 +14,20 @@ import org.xml.sax.SAXException;
 import com.sun.xml.xsom.parser.XSOMParser;
 import com.sun.xml.xsom.XSSchemaSet;
 
-public class WadlParser {
+import edu.sjtu.ist.bjggzxb.WadlParser.core.MethodNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ResourceTypeNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.WadlParser;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.WadlXML;
+public class SimpleParser extends WadlParser {
 
 	public static String SUCCESS = "success";
 
-	private ApplicationNode application;
-	private XSSchemaSet grammarSet;
-	private Document doc;
-	private SAXBuilder builder;
+	protected ApplicationNodeImpl application;
+	protected XSSchemaSet grammarSet;
+	protected Document doc;
+	protected SAXBuilder builder;
 
-	public ApplicationNode getApplication() {
+	public ApplicationNodeImpl getApplication() {
 		return application;
 	}
 
@@ -32,8 +35,8 @@ public class WadlParser {
 		return grammarSet;
 	}
 
-	public WadlParser() {
-		this.application = new ApplicationNode();
+	public SimpleParser() {
+		this.application = new ApplicationNodeImpl();
 		this.builder = new SAXBuilder();
 	}
 
@@ -46,8 +49,8 @@ public class WadlParser {
 			return false;
 		}
 	}
-	
-	public boolean buildDoc(String str){
+
+	public boolean buildDoc(String str) {
 		InputStream ins = new ByteArrayInputStream(str.getBytes());
 		return buildDoc(ins);
 	}
@@ -56,36 +59,12 @@ public class WadlParser {
 		if (doc == null)
 			return "Document is not initialized.";
 		Element root = doc.getRootElement();
-		application = new ApplicationNode();
+		application = new ApplicationNodeImpl();
 		grammarSet = null;
 		if (!root.getName().equals(WadlXML.applicationNode))
 			return "Document can't be parsed";
-		List<Attribute> appAttributes = root.getAttributes();
-		if (appAttributes.size() == 0) {
-			System.out.println("Document namespace not defined.");
-			// return "Document namespace not defined.";
-		}
 		application.setNamespace(root.getAdditionalNamespaces());
-		
-		/*
-		 * This part is wrong code
-		 */
-		
-		// Iterator<Attribute> attIter = appAttributes.iterator();
-		// while (attIter.hasNext()) {
-		// Attribute attri = attIter.next();
-		// String name = attri.getName();
-		// String value = attri.getValue();
-		// if (name.equals(WadlXML.application_xmlns)
-		// || name.equals(WadlXML.application_xmlns_xsd)
-		// || name.equals(WadlXML.application_xmlns_xsi)
-		// || name.equals(WadlXML.application_xsi_schemaLocation)
-		// || name.startsWith(WadlXML.application_xmlns_extNs)) {
-		// application.addNamespace(new NamespaceAttribute(name, value));
-		// }
-		// }
-		
-		
+
 		List<Element> elements = root.getChildren();
 		System.out.println("Get " + elements.size() + " Elements");
 		if (elements.size() == 0)
@@ -125,7 +104,7 @@ public class WadlParser {
 		return null;
 	}
 
-	private boolean parseGrammars(Element grammars) {
+	protected boolean parseGrammars(Element grammars) {
 		XMLOutputter out = new XMLOutputter();
 		XSOMParser parser = new XSOMParser();
 		List<Element> grammarList = grammars.getChildren();
@@ -150,20 +129,21 @@ public class WadlParser {
 		return true;
 	}
 
-	private boolean parseDoc(Element doc, GenericNode parent) {
+	protected boolean parseDoc(Element doc, GenericNodeImpl parent) {
 		String xmlLang = doc.getAttributeValue(WadlXML.doc_xml_lang);
 		String title = doc.getAttributeValue(WadlXML.doc_title);
 		String text = doc.getText();
-		DocNode docNode = new DocNode(xmlLang, title, text);
+		DocNodeImpl docNode = new DocNodeImpl(xmlLang, title, text);
 		parent.addDoc(docNode);
 		return true;
 	}
 
-	private boolean parseResources(Element resources) {
+	protected boolean parseResources(Element resources) {
 		String base = resources.getAttributeValue(WadlXML.resources_base);
 		if (base == null)
 			base = "";
-		ResourcesNode resourcesNode = new ResourcesNode(base, application);
+		ResourcesNodeImpl resourcesNode = new ResourcesNodeImpl(base,
+				application);
 		application.addResources(resourcesNode);
 
 		Iterator<Element> iter = resources.getChildren().iterator();
@@ -176,7 +156,7 @@ public class WadlParser {
 		return true;
 	}
 
-	private boolean parseResource(Element resource, GenericNode parent) {
+	protected ResourceNodeImpl parseResource(Element resource, GenericNodeImpl parent) {
 		String path = resource.getAttributeValue(WadlXML.resource_path);
 		String id = resource.getAttributeValue(WadlXML.resource_id);
 		String type = resource.getAttributeValue(WadlXML.resource_type);
@@ -184,7 +164,7 @@ public class WadlParser {
 				.getAttributeValue(WadlXML.resource_queryType);
 		if (path == null)
 			path = "";
-		ResourceNode resourceNode = new ResourceNode(path, parent);
+		ResourceNodeImpl resourceNode = new ResourceNodeImpl(path, parent);
 		resourceNode.setId(id);
 		resourceNode.setType(type);
 		resourceNode.setQueryType(queryType);
@@ -214,44 +194,45 @@ public class WadlParser {
 				this.parseDoc(child, resourceNode);
 			}
 		}
-		return true;
+		return resourceNode;
 	}
 
-	private boolean parseMethod(Element method, GenericNode parent) {
+	protected MethodNodeImpl parseMethod(Element method, GenericNodeImpl parent) {
 		String href = method.getAttributeValue(WadlXML.method_href);
+		MethodNodeImpl methodNode;
 		if (href != null) {
 			if (href.startsWith("#"))
 				href = href.substring(1);
-			MethodNode methodNode = application.getMethodById(href);
+			methodNode = (MethodNodeImpl) application
+					.getMethodById(href);
 			if (methodNode != null) {
-				MethodNode newNode = new MethodNode(methodNode,
-						parent);
+				MethodNode newNode = new MethodNodeImpl(methodNode, parent);
 				parent.addMethod(newNode);
 			} else
 				System.out.println("No method " + href + " found.");
 		} else {
 			String id = method.getAttributeValue(WadlXML.method_id);
-			MethodNode newNode = new MethodNode(id, parent);
-			newNode.setName(method.getAttributeValue(WadlXML.method_name));
+			methodNode = new MethodNodeImpl(id, parent);
+			methodNode.setName(method.getAttributeValue(WadlXML.method_name));
 
-			parent.addMethod(newNode);
+			parent.addMethod(methodNode);
 			Iterator<Element> iter = method.getChildren().iterator();
 			while (iter.hasNext()) {
 				Element child = iter.next();
 				if (child.getName().equals(WadlXML.docNode)) {
-					this.parseDoc(child, newNode);
+					this.parseDoc(child, methodNode);
 				} else if (child.getName().equals(WadlXML.requestNode)) {
-					this.parseRequest(child, newNode);
+					this.parseRequest(child, methodNode);
 				} else if (child.getName().equals(WadlXML.responseNode)) {
-					this.parseResponse(child, newNode);
+					this.parseResponse(child, methodNode);
 				}
 			}
 		}
-		return true;
+		return methodNode;
 	}
 
-	private boolean parseRequest(Element request, MethodNode parent) {
-		RequestNode requestNode = new RequestNode(parent);
+	protected boolean parseRequest(Element request, MethodNodeImpl parent) {
+		RequestNodeImpl requestNode = new RequestNodeImpl(parent);
 		parent.setRequest(requestNode);
 		Iterator<Element> iter = request.getChildren().iterator();
 		while (iter.hasNext()) {
@@ -267,8 +248,8 @@ public class WadlParser {
 		return true;
 	}
 
-	private boolean parseResponse(Element response, MethodNode parent) {
-		ResponseNode responseNode = new ResponseNode(parent);
+	protected boolean parseResponse(Element response, MethodNodeImpl parent) {
+		ResponseNodeImpl responseNode = new ResponseNodeImpl(parent);
 		parent.setResponse(responseNode);
 		Iterator<Element> iter = response.getChildren().iterator();
 		while (iter.hasNext()) {
@@ -284,24 +265,24 @@ public class WadlParser {
 		return true;
 	}
 
-	private boolean parseParam(Element param, GenericNode parent) {
+	protected boolean parseParam(Element param, GenericNodeImpl parent) {
 		String href = param.getAttributeValue(WadlXML.param_href);
 		if (href != null) {
 			if (href.startsWith("#"))
 				href = href.substring(1);
-			ParamNode paramNode = application.getParamById(href);
+			ParamNodeImpl paramNode = (ParamNodeImpl) application
+					.getParamById(href);
 			if (paramNode != null) {
-				ParamNode newNode = new ParamNode(paramNode,
-						parent);
+				ParamNodeImpl newNode = new ParamNodeImpl(paramNode, parent);
 				parent.addParam(newNode);
 			}
 		} else {
 			String id = param.getAttributeValue(WadlXML.param_id);
-			ParamNode newNode;
+			ParamNodeImpl newNode;
 			if (id == null) {
-				newNode = new ParamNode(parent);
+				newNode = new ParamNodeImpl(parent);
 			} else {
-				newNode = new ParamNode(id, parent);
+				newNode = new ParamNodeImpl(id, parent);
 			}
 			newNode.setName(param.getAttributeValue(WadlXML.param_name));
 			newNode.setStyle(param.getAttributeValue(WadlXML.param_style));
@@ -328,12 +309,12 @@ public class WadlParser {
 		return true;
 	}
 
-	private boolean parseLink(Element link, ParamNode parent) {
+	protected boolean parseLink(Element link, ParamNodeImpl parent) {
 		String resourceType = link
 				.getAttributeValue(WadlXML.link_resource_type);
 		String rel = link.getAttributeValue(WadlXML.link_rel);
 		String rev = link.getAttributeValue(WadlXML.link_rev);
-		LinkNode linkNode = new LinkNode();
+		LinkNodeImpl linkNode = new LinkNodeImpl();
 		linkNode.setResourceType(resourceType);
 		linkNode.setRel(rel);
 		linkNode.setRev(rev);
@@ -349,37 +330,37 @@ public class WadlParser {
 		return true;
 	}
 
-	private boolean parseOption(Element option, ParamNode parent) {
+	protected boolean parseOption(Element option, ParamNodeImpl parent) {
 		String value = option.getAttributeValue(WadlXML.option_value);
 		String mediaType = option.getAttributeValue(WadlXML.option_mediaType);
-		OptionNode optionNode = new OptionNode();
+		OptionNodeImpl optionNode = new OptionNodeImpl();
 		optionNode.setValue(value);
 		optionNode.setMediaType(mediaType);
 		parent.addOption(optionNode);
 		return true;
 	}
 
-	private boolean parseRepresentation(Element representation,
-			GenericNode parent) {
+	protected boolean parseRepresentation(Element representation,
+			GenericNodeImpl parent) {
 		String href = representation
 				.getAttributeValue(WadlXML.representation_href);
 		if (href != null) {
 			if (href.startsWith("#"))
 				href = href.substring(1);
-			RepresentationNode representationNode = application
+			RepresentationNodeImpl representationNode = (RepresentationNodeImpl) application
 					.getRepresentationById(href);
 			if (representationNode != null) {
-				RepresentationNode newNode = new RepresentationNode(
+				RepresentationNodeImpl newNode = new RepresentationNodeImpl(
 						representationNode, parent);
 				parent.addRepresentation(newNode);
 			}
 		} else {
 			String id = representation.getAttributeValue(WadlXML.param_id);
-			RepresentationNode newNode;
+			RepresentationNodeImpl newNode;
 			if (id == null) {
-				newNode = new RepresentationNode(parent);
+				newNode = new RepresentationNodeImpl(parent);
 			} else {
-				newNode = new RepresentationNode(id, parent);
+				newNode = new RepresentationNodeImpl(id, parent);
 			}
 			newNode.setElement(representation
 					.getAttributeValue(WadlXML.representation_element));
@@ -402,9 +383,9 @@ public class WadlParser {
 		return true;
 	}
 
-	private boolean parseResourceType(Element resourceType) {
+	protected boolean parseResourceType(Element resourceType) {
 		String id = resourceType.getAttributeValue(WadlXML.resource_type_id);
-		ResourceTypeNode rtNode = new ResourceTypeNode(id, application);
+		ResourceTypeNodeImpl rtNode = new ResourceTypeNodeImpl(id, application);
 		Iterator<Element> iter = resourceType.getChildren().iterator();
 		application.addResourceType(rtNode);
 		while (iter.hasNext()) {

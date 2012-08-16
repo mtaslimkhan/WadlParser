@@ -5,13 +5,16 @@
  * 	elements describe the resources provided by the application.
  */
 
-package edu.sjtu.ist.bjggzxb.WadlParser;
+package edu.sjtu.ist.bjggzxb.WadlParser.impl;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
-public class ResourcesNode extends GenericNode {
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ResourceNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ResourcesNode;
+
+public class ResourcesNodeImpl extends GenericNodeImpl implements ResourcesNode{
 
 	/*
 	 * For each <resources> node, it should contains base attribute and some
@@ -21,7 +24,7 @@ public class ResourcesNode extends GenericNode {
 
 	private List<ResourceNode> resourceNodes;
 
-	public ResourcesNode(String resourcesBase, ApplicationNode application) {
+	public ResourcesNodeImpl(String resourcesBase, ApplicationNodeImpl application) {
 		// resource base should start with "http://" and end without "/"
 		// out rule is differnet from w3c documentation
 		if (resourcesBase.endsWith("/"))

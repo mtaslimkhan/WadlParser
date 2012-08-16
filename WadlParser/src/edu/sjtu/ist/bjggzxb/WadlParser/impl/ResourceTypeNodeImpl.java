@@ -29,13 +29,20 @@
  *
  */
 
-package edu.sjtu.ist.bjggzxb.WadlParser;
+package edu.sjtu.ist.bjggzxb.WadlParser.impl;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class ResourceTypeNode extends GenericNode {
+import edu.sjtu.ist.bjggzxb.WadlParser.core.DocNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.MethodNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ParamNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ResourceNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ResourceTypeNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.WadlException;
+
+public class ResourceTypeNodeImpl extends GenericNodeImpl implements ResourceTypeNode{
 
 	private final String id;
 	private List<DocNode> docNodes;
@@ -43,7 +50,7 @@ public class ResourceTypeNode extends GenericNode {
 	private List<MethodNode> methodNodes;
 	private List<ResourceNode> resourceNodes;
 
-	public ResourceTypeNode(String resourceTypeId, ApplicationNode application) {
+	public ResourceTypeNodeImpl(String resourceTypeId, ApplicationNodeImpl application) {
 		if (resourceTypeId == null)
 			throw new WadlException("Resource_Type Id is null.");
 		this.id = resourceTypeId;

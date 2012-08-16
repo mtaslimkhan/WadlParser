@@ -1,4 +1,4 @@
-package edu.sjtu.ist.bjggzxb.WadlParser;
+package edu.sjtu.ist.bjggzxb.WadlParser.core;
 
 public class WadlXML {
 	public static final String applicationNode = "application";

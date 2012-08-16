@@ -38,16 +38,21 @@
 		In addition to the attributes listed above, a representation definition element 
 		can have zero or more child doc elements and param elements.
  */
-package edu.sjtu.ist.bjggzxb.WadlParser;
+package edu.sjtu.ist.bjggzxb.WadlParser.impl;
 
 import java.util.List;
 import java.util.ArrayList;
 
-public class RepresentationNode extends GenericNode {
+import edu.sjtu.ist.bjggzxb.WadlParser.core.DocNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ParamNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.RepresentationNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.WadlException;
+
+public class RepresentationNodeImpl extends GenericNodeImpl implements RepresentationNode{
 
 	private final boolean href;
 	private final String id;
-	private final RepresentationNode hrefNode;
+	private final RepresentationNodeImpl hrefNode;
 
 	private String mediaType;
 	private String element;
@@ -55,14 +60,14 @@ public class RepresentationNode extends GenericNode {
 	private List<DocNode> docNodes = new ArrayList<DocNode>();
 	private List<ParamNode> paramNodes = new ArrayList<ParamNode>();
 
-	public RepresentationNode(GenericNode parent) {
+	public RepresentationNodeImpl(GenericNodeImpl parent) {
 		this.href = false;
 		this.id = null;
 		this.hrefNode = null;
 		super.parentNode = parent;
 	}
 
-	public RepresentationNode(String id, GenericNode parent) {
+	public RepresentationNodeImpl(String id, GenericNodeImpl parent) {
 		if (id == null)
 			throw new WadlException("Representation id is null.");
 		this.href = false;
@@ -71,7 +76,7 @@ public class RepresentationNode extends GenericNode {
 		super.parentNode = parent;
 	}
 
-	public RepresentationNode(RepresentationNode other, GenericNode parent) {
+	public RepresentationNodeImpl(RepresentationNodeImpl other, GenericNodeImpl parent) {
 		if (other == null)
 			throw new WadlException("Representation href node is null.");
 		this.href = true;
@@ -82,8 +87,8 @@ public class RepresentationNode extends GenericNode {
 
 	@Override
 	public boolean equals(Object other) {
-		if (other instanceof RepresentationNode) {
-			RepresentationNode rep = (RepresentationNode) other;
+		if (other instanceof RepresentationNodeImpl) {
+			RepresentationNodeImpl rep = (RepresentationNodeImpl) other;
 			if (id != null && rep.id != null) {
 				if (id.equals(rep.id))
 					return true;

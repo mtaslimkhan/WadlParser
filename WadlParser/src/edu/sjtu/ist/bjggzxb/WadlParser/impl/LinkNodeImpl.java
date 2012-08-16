@@ -21,12 +21,15 @@
  *		profile attribute. 
  */
 
-package edu.sjtu.ist.bjggzxb.WadlParser;
+package edu.sjtu.ist.bjggzxb.WadlParser.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LinkNode extends GenericNode {
+import edu.sjtu.ist.bjggzxb.WadlParser.core.DocNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.LinkNode;
+
+public class LinkNodeImpl extends GenericNodeImpl implements LinkNode{
 
 	private List<DocNode> docNodes = new ArrayList<DocNode>();
 	private String resourceType;

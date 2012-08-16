@@ -19,20 +19,25 @@
 
  */
 
-package edu.sjtu.ist.bjggzxb.WadlParser;
+package edu.sjtu.ist.bjggzxb.WadlParser.impl;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
-public class ResponseNode extends GenericNode {
+import edu.sjtu.ist.bjggzxb.WadlParser.core.DocNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ParamNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.RepresentationNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ResponseNode;
+
+public class ResponseNodeImpl extends GenericNodeImpl implements ResponseNode{
 
 	private List<DocNode> docNodes = new ArrayList<DocNode>();
 	private List<ParamNode> paramNodes = new ArrayList<ParamNode>();
 	private List<RepresentationNode> representationNodes = new ArrayList<RepresentationNode>();
 	private int status;
 
-	public ResponseNode(MethodNode method) {
+	public ResponseNodeImpl(MethodNodeImpl method) {
 		this.paramNodes = new ArrayList<ParamNode>();
 		this.representationNodes = new ArrayList<RepresentationNode>();
 		super.parentNode = method;
@@ -87,7 +92,7 @@ public class ResponseNode extends GenericNode {
 
 	@Override
 	public boolean equals(Object other) {
-		if (other instanceof RequestNode) {
+		if (other instanceof RequestNodeImpl) {
 			ResponseNode response = (ResponseNode) other;
 			if (paramNodes.size() != response.getAllParams().size()
 					|| representationNodes.size() != response

@@ -11,7 +11,7 @@
  *       param elements
  */
 
-package edu.sjtu.ist.bjggzxb.WadlParser;
+package edu.sjtu.ist.bjggzxb.WadlParser.impl;
 
 import java.util.Iterator;
 import java.util.List;
@@ -19,10 +19,19 @@ import java.util.ArrayList;
 
 import org.jdom2.Namespace;
 
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ApplicationNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.DocNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.MethodNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ParamNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.RepresentationNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ResourceNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ResourceTypeNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ResourcesNode;
+
 /*
  * Here we don't parse grammars node
  */
-public class ApplicationNode extends GenericNode {
+public class ApplicationNodeImpl extends GenericNodeImpl implements ApplicationNode{
 
 	private List<DocNode> docNodes;
 	private List<ResourcesNode> resourcesNodes;
@@ -32,7 +41,7 @@ public class ApplicationNode extends GenericNode {
 	private List<ParamNode> paramNodes;
 	private List<Namespace> namespaceAttributes;
 
-	public ApplicationNode() {
+	public ApplicationNodeImpl() {
 		docNodes = new ArrayList<DocNode>();
 		resourcesNodes = new ArrayList<ResourcesNode>();
 		resourceTypeNodes = new ArrayList<ResourceTypeNode>();
@@ -42,7 +51,7 @@ public class ApplicationNode extends GenericNode {
 		namespaceAttributes = new ArrayList<Namespace>();
 	}
 
-	protected boolean addResources(ResourcesNode resources) {
+	protected boolean addResources(ResourcesNodeImpl resources) {
 		if (resources != null) {
 			resourcesNodes.add(resources);
 			return true;
@@ -126,7 +135,6 @@ public class ApplicationNode extends GenericNode {
 		return res;
 	}
 
-	@Override
 	protected boolean addDoc(DocNode doc) {
 		if (doc != null) {
 			this.docNodes.add(doc);
@@ -138,8 +146,7 @@ public class ApplicationNode extends GenericNode {
 	public List<DocNode> getAllDocs() {
 		return this.docNodes;
 	}
-
-	@Override
+	
 	protected boolean addParam(ParamNode param) {
 		if (param == null)
 			return false;
@@ -173,7 +180,7 @@ public class ApplicationNode extends GenericNode {
 		return methodNodes;
 	}
 
-	@Override
+
 	protected boolean addMethod(MethodNode method) {
 		if (method == null)
 			return false;
@@ -199,7 +206,6 @@ public class ApplicationNode extends GenericNode {
 		return null;
 	}
 
-	@Override
 	protected boolean addRepresentation(RepresentationNode representation) {
 		if (!representationNodes.contains(representation)) {
 			representationNodes.add(representation);

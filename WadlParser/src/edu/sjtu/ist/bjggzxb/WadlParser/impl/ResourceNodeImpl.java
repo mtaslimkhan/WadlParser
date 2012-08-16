@@ -48,47 +48,59 @@
     	globally for the parent resource.
  */
 
-package edu.sjtu.ist.bjggzxb.WadlParser;
+package edu.sjtu.ist.bjggzxb.WadlParser.impl;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class ResourceNode extends GenericNode {
+import com.google.gson.Gson;
+
+import edu.sjtu.ist.bjggzxb.WadlParser.core.DocNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.MethodNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ParamNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ResourceNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ResourceTypeNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.schema.BaseElement;
+import edu.sjtu.ist.bjggzxb.doc.ResourceDoc;
+
+public class ResourceNodeImpl extends GenericNodeImpl implements ResourceNode {
 
 	/*
 	 * attributes from defination of wadl
 	 */
-	private List<DocNode> docNodes = new ArrayList<DocNode>();
-	private List<ParamNode> paramNodes = new ArrayList<ParamNode>();
-	private List<MethodNode> methodNodes = new ArrayList<MethodNode>();
-	private List<ResourceNode> resourceNodes = new ArrayList<ResourceNode>();
-	private List<ResourceTypeNode> resourceTypeNodes = new ArrayList<ResourceTypeNode>();
-	private String path;
-	private String id;
-	private String type;
-	private String queryType;
+	protected List<DocNode> docNodes = new ArrayList<DocNode>();
+	protected List<ParamNode> paramNodes = new ArrayList<ParamNode>();
+	protected List<MethodNode> methodNodes = new ArrayList<MethodNode>();
+	protected List<ResourceNode> resourceNodes = new ArrayList<ResourceNode>();
+	protected List<ResourceTypeNode> resourceTypeNodes = new ArrayList<ResourceTypeNode>();
+	protected String path;
+	protected String id;
+	protected String type;
+	protected String queryType;
+
+	/*
+	 * xml schema defined element
+	 */
+	protected BaseElement elementDecl;
 
 	/*
 	 * these two attributes are info about full path resource
 	 */
-	private String absolutePath;
-	private List<ParamNode> parentParams = new ArrayList<ParamNode>();
+	protected String absolutePath;
+	protected List<ParamNode> parentParams = new ArrayList<ParamNode>();
 
 	/*
-	 * doc attributes
+	 * all doc info
 	 */
-	private String miniDes;
-	private String des;
-	private String name;
+	protected ResourceDoc docInfo;
 
 	/*
 	 * other
 	 */
 	private int hashCode;
-	private String provider;
 
-	public ResourceNode(String resourcePath, GenericNode parentNode) {
+	public ResourceNodeImpl(String resourcePath, GenericNodeImpl parentNode) {
 		// every path should start with "/" and end whithout "/", empty path
 		// should be ""
 		// out rule is differnet from w3c documentation
@@ -101,70 +113,38 @@ public class ResourceNode extends GenericNode {
 
 		// take care of the real node type of parent <resource> and <resources>
 		absolutePath = path;
-		ResourceNode iter = this;
-		while (iter.getParentNode() instanceof ResourceNode) {
-			ResourceNode resource = (ResourceNode) iter.getParentNode();
+		ResourceNodeImpl iter = this;
+		while (iter.getParentNode() instanceof ResourceNodeImpl) {
+			ResourceNodeImpl resource = (ResourceNodeImpl) iter.getParentNode();
 			String parentPath = resource.getPath();
 			absolutePath = parentPath + absolutePath;
 			parentParams.addAll(0, resource.getAllParams());
-			iter = (ResourceNode) iter.getParentNode();
+			iter = (ResourceNodeImpl) iter.getParentNode();
 		}
-		if (iter.getParentNode() instanceof ResourcesNode) {
-			String parentPath = ((ResourcesNode) iter.getParentNode())
+		if (iter.getParentNode() instanceof ResourcesNodeImpl) {
+			String parentPath = ((ResourcesNodeImpl) iter.getParentNode())
 					.getBase();
 			absolutePath = parentPath + absolutePath;
-		} else if (iter.getParentNode() instanceof ResourceTypeNode) {
+		} else if (iter.getParentNode() instanceof ResourceTypeNodeImpl) {
 			String parentPath = "";
 			absolutePath = parentPath + absolutePath;
 		}
 		hashCode = hashCode();
 	}
 
-	public void iniDoc() {
-		miniDes = null;
-		des = "No Description.";
-		name = "Noname";
-		if (docNodes.size() == 0) {
-			try {
-				name = path.substring(path.lastIndexOf("/") + 1);
-			} catch (Exception e) {
-			}
-		} else {
-			Iterator<DocNode> iter = docNodes.iterator();
-			while (iter.hasNext()) {
-				DocNode doc = iter.next();
-				if (doc.getTitle().equalsIgnoreCase("name"))
-					name = doc.getText();
-				else if (doc.getTitle().equalsIgnoreCase("minidescription"))
-					miniDes = doc.getText();
-				else if (doc.getTitle().equalsIgnoreCase("description"))
-					des = doc.getText();
+	protected void iniDoc() {
+		int size = docNodes.size();
+		for (int index = 0; index < size; index++) {
+			DocNode doc = docNodes.get(index);
+			if (doc.getTitle().equals("istdoc")) {
+				Gson gson = new Gson();
+				docInfo = gson.fromJson(doc.getText(), ResourceDoc.class);
 			}
 		}
 	}
 
-	public String getProvider() {
-		return provider;
-	}
-
-	public void setProvider(String provider) {
-		this.provider = provider;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public String getMiniDes() {
-		return miniDes;
-	}
-
-	public String getDes() {
-		return des;
-	}
-
-	public String getPath() {
-		return path;
+	public BaseElement getElementDecl() {
+		return elementDecl;
 	}
 
 	public String getAbsolutePath() {
@@ -220,32 +200,16 @@ public class ResourceNode extends GenericNode {
 		resourceTypeNodes.add(resourceType);
 	}
 
-	public List<ResourceTypeNode> getAllResourceTypes() {
-		return resourceTypeNodes;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	protected void setType(String type) {
-		this.type = type;
-	}
-
-	public String getQueryType() {
-		return queryType;
-	}
-
 	protected void setQueryType(String queryType) {
 		this.queryType = queryType;
 	}
 
-	public String getId() {
-		return id;
-	}
-
 	protected void setId(String newId) {
 		id = newId;
+	}
+
+	protected void setType(String type) {
+		this.type = type;
 	}
 
 	@Override
@@ -262,18 +226,6 @@ public class ResourceNode extends GenericNode {
 		return false;
 	}
 
-	public List<DocNode> getAllDocs() {
-		return this.docNodes;
-	}
-
-	public List<ParamNode> getAllParams() {
-		return paramNodes;
-	}
-
-	public List<ParamNode> getParentParams() {
-		return parentParams;
-	}
-
 	@Override
 	protected boolean addParam(ParamNode param) {
 		if (!paramNodes.contains(param)) {
@@ -282,10 +234,6 @@ public class ResourceNode extends GenericNode {
 			return true;
 		}
 		return false;
-	}
-
-	public List<ResourceNode> getAllResources() {
-		return resourceNodes;
 	}
 
 	private boolean containsResource(String path) {
@@ -324,5 +272,82 @@ public class ResourceNode extends GenericNode {
 		result = prime * result
 				+ ((absolutePath == null) ? 0 : absolutePath.hashCode());
 		return result;
+	}
+
+	@Override
+	public List<ResourceNode> getAllResources() {
+		return resourceNodes;
+	}
+
+	@Override
+	public List<DocNode> getAllDocs() {
+		return this.docNodes;
+	}
+
+	@Override
+	public List<ParamNode> getAllParams() {
+		return paramNodes;
+	}
+
+	@Override
+	public List<ParamNode> getParentParams() {
+		return parentParams;
+	}
+
+	@Override
+	public List<ResourceTypeNode> getAllResourceTypes() {
+		return resourceTypeNodes;
+	}
+
+	@Override
+	public String getType() {
+		return type;
+	}
+
+	@Override
+	public String getQueryType() {
+		return queryType;
+	}
+
+	@Override
+	public String getProvider() {
+		if (docInfo == null)
+			return "uknown";
+		else
+			return docInfo.provider;
+	}
+
+	@Override
+	public String getName() {
+		if (docInfo == null)
+			return "uknown";
+		else
+			return docInfo.name;
+	}
+
+	@Override
+	public String getMiniDes() {
+		if (docInfo == null)
+			return "none";
+		else
+			return docInfo.minides;
+	}
+
+	@Override
+	public String getDes() {
+		if (docInfo == null)
+			return "none";
+		else
+			return docInfo.description;
+	}
+
+	@Override
+	public String getPath() {
+		return path;
+	}
+
+	@Override
+	public String getId() {
+		return id;
 	}
 }

@@ -11,28 +11,33 @@
  *    	SHOULD be suitable for use as a title for the contained documentation. 
  */
 
-package edu.sjtu.ist.bjggzxb.WadlParser;
+package edu.sjtu.ist.bjggzxb.WadlParser.impl;
 
-public class DocNode{
+import edu.sjtu.ist.bjggzxb.WadlParser.core.DocNode;
+
+public class DocNodeImpl implements DocNode {
 	private String xmlLang;
 	private String title;
 	private String text;
 
-	public DocNode(String docLang, String docTitle, String docText){
+	public DocNodeImpl(String docLang, String docTitle, String docText) {
 		this.xmlLang = docLang;
 		this.title = docTitle;
 		this.text = docText;
 	}
-	
-	public String getXmlLang(){
+
+	@Override
+	public String getXmlLang() {
 		return xmlLang;
 	}
 
-	public String getTitle(){
+	@Override
+	public String getTitle() {
 		return title;
 	}
 
-	public String getText(){
+	@Override
+	public String getText() {
 		return text;
 	}
 }

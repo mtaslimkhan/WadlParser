@@ -70,12 +70,16 @@ plain 		representation 									Specifies a component of the representation form
  
  */
 
-package edu.sjtu.ist.bjggzxb.WadlParser;
+package edu.sjtu.ist.bjggzxb.WadlParser.impl;
 
 import java.util.List;
 import java.util.ArrayList;
 
-public class ParamNode extends GenericNode {
+import edu.sjtu.ist.bjggzxb.WadlParser.core.LinkNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.OptionNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ParamNode;
+
+public class ParamNodeImpl extends GenericNodeImpl implements ParamNode{
 
 	public static String MATRIX_TYPE = "matrix";
 	public static String HEADER_TYPE = "header";
@@ -85,7 +89,7 @@ public class ParamNode extends GenericNode {
 
 	private final boolean href;
 	private final String id;
-	private final ParamNode hrefNode;
+	private final ParamNodeImpl hrefNode;
 
 	private String name;
 	private String style;
@@ -104,8 +108,8 @@ public class ParamNode extends GenericNode {
 	 */
 	@Override
 	public boolean equals(Object other) {
-		if (other instanceof ParamNode) {
-			ParamNode param = (ParamNode) other;
+		if (other instanceof ParamNodeImpl) {
+			ParamNodeImpl param = (ParamNodeImpl) other;
 			if (id != null && param.getId() != null) {
 				if (id.equals(param.getId()))
 					return true;
@@ -115,21 +119,21 @@ public class ParamNode extends GenericNode {
 		return false;
 	}
 
-	public ParamNode(GenericNode parent) {
+	public ParamNodeImpl(GenericNodeImpl parent) {
 		this.href = false;
 		this.id = null;
 		this.hrefNode = null;
 		super.parentNode = parent;
 	}
 
-	public ParamNode(String id, GenericNode parent) {
+	public ParamNodeImpl(String id, GenericNodeImpl parent) {
 		this.href = false;
 		this.id = id;
 		this.hrefNode = null;
 		super.parentNode = parent;
 	}
 
-	public ParamNode(ParamNode other, GenericNode parent) {
+	public ParamNodeImpl(ParamNodeImpl other, GenericNodeImpl parent) {
 		this.href = true;
 		this.id = null;
 		this.hrefNode = other;
@@ -144,7 +148,7 @@ public class ParamNode extends GenericNode {
 		return id;
 	}
 
-	public ParamNode getHrefNode() {
+	public ParamNodeImpl getHrefNode() {
 		return hrefNode;
 	}
 

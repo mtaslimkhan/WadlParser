@@ -35,17 +35,23 @@
 		    Zero or more response elements that describe the possible outputs of the method 
  */
 
-package edu.sjtu.ist.bjggzxb.WadlParser;
+package edu.sjtu.ist.bjggzxb.WadlParser.impl;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
-public class MethodNode extends GenericNode {
+import edu.sjtu.ist.bjggzxb.WadlParser.core.DocNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.MethodNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.RequestNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.ResponseNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.WadlException;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.schema.BaseElement;
+
+public class MethodNodeImpl extends GenericNodeImpl implements MethodNode{
 
 	private final boolean href;
 	private final String id;
-	private final MethodNode hrefNode;
+	private final MethodNodeImpl hrefNode;
 
 	private String name;
 	private RequestNode requestNode;
@@ -53,11 +59,16 @@ public class MethodNode extends GenericNode {
 	private List<DocNode> docNodes = new ArrayList<DocNode>();
 
 	/*
+	 * xml schema defined element
+	 */
+	protected BaseElement elementDecl;
+	
+	/*
 	 * from doc
 	 */
-	private String miniDes;
-	private String des;
-	private String docName;
+	private String miniDes = "none";
+	private String des = "none";
+	private String docName = "known";
 	
 	public String getMiniDes() {
 		return miniDes;
@@ -71,52 +82,38 @@ public class MethodNode extends GenericNode {
 		return docName;
 	}
 
-	public MethodNode(GenericNode parent) {
-		this.href = false;
-		this.id = null;
-		this.hrefNode = null;
-		super.parentNode = parent;
+	public MethodNodeImpl(GenericNodeImpl parent) {
+		href = false;
+		id = null;
+		hrefNode = null;
+		parentNode = parent;
 	}
 
-	public MethodNode(String id, GenericNode parent) {
-		this.href = false;
+	public MethodNodeImpl(String id, GenericNodeImpl parent) {
+		href = false;
 		this.id = id;
-		this.hrefNode = null;
-		super.parentNode = parent;
+		hrefNode = null;
+		parentNode = parent;
 	}
 
-	public MethodNode(MethodNode other, GenericNode parent)
+	public MethodNodeImpl(MethodNodeImpl other, GenericNodeImpl parent)
 			throws WadlException {
 		if (other == null)
 			throw new WadlException("Method reference is null pointer.");
-		this.href = true;
-		this.id = null;
-		this.hrefNode = other;
-		super.parentNode = parent;
+		href = true;
+		id = null;
+		hrefNode = other;
+		parentNode = parent;
 	}
 
-	public void iniDoc() {
-		miniDes = null;
-		des = "No Description.";
-		docName = "Noname";
-
-		Iterator<DocNode> iter = docNodes.iterator();
-		while (iter.hasNext()) {
-			DocNode doc = iter.next();
-			if (doc.getTitle().equalsIgnoreCase("name"))
-				docName = doc.getText();
-			else if (doc.getTitle().equalsIgnoreCase("minidescription"))
-				miniDes = doc.getText();
-			else if (doc.getTitle().equalsIgnoreCase("description"))
-				des = doc.getText();
-		}
-
+	protected void iniDoc() {
+		
 	}
 
 	@Override
 	public boolean equals(Object other) {
-		if (other instanceof MethodNode) {
-			MethodNode method = (MethodNode) other;
+		if (other instanceof MethodNodeImpl) {
+			MethodNodeImpl method = (MethodNodeImpl) other;
 			if (href && method.isHref() && hrefNode == method.getHrefNode()) {
 				return true;
 			} else if (id != null && method.getId() != null) {
@@ -129,7 +126,7 @@ public class MethodNode extends GenericNode {
 		return false;
 	}
 
-	private boolean hasSameContext(MethodNode method) {
+	private boolean hasSameContext(MethodNodeImpl method) {
 		try {
 			if (!this.getName().equals(method.getName()))
 				return false;
@@ -142,12 +139,17 @@ public class MethodNode extends GenericNode {
 		}
 		return false;
 	}
+	
+	@Override
+	public BaseElement getElementDecl(){
+		return elementDecl;
+	}
 
 	protected boolean isHref() {
 		return href;
 	}
 
-	protected MethodNode getHrefNode() {
+	protected MethodNodeImpl getHrefNode() {
 		return hrefNode;
 	}
 
@@ -156,6 +158,7 @@ public class MethodNode extends GenericNode {
 			this.name = name;
 	}
 
+	@Override
 	public String getName() {
 		if (href)
 			return hrefNode.getName();
@@ -163,15 +166,17 @@ public class MethodNode extends GenericNode {
 			return name;
 	}
 
+	@Override
 	public String getId() {
 		return id;
 	}
 
-	protected void setRequest(RequestNode request) {
+	protected void setRequest(RequestNodeImpl request) {
 		if (!href)
 			requestNode = request;
 	}
 
+	@Override
 	public RequestNode getRequest() {
 		if (href)
 			return hrefNode.getRequest();
@@ -179,11 +184,12 @@ public class MethodNode extends GenericNode {
 			return requestNode;
 	}
 
-	protected void setResponse(ResponseNode response) {
+	protected void setResponse(ResponseNodeImpl response) {
 		if (!href)
 			responseNode = response;
 	}
 
+	@Override
 	public ResponseNode getResponse() {
 		if (href)
 			return hrefNode.getResponse();
@@ -191,7 +197,6 @@ public class MethodNode extends GenericNode {
 			return responseNode;
 	}
 
-	@Override
 	protected boolean addDoc(DocNode doc) {
 		if (!href && doc != null) {
 			this.docNodes.add(doc);
@@ -200,6 +205,7 @@ public class MethodNode extends GenericNode {
 		return false;
 	}
 
+	@Override
 	public List<DocNode> getAllDocs() {
 		if (href)
 			return hrefNode.getAllDocs();

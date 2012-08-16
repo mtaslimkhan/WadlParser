@@ -11,18 +11,21 @@
  *
  *	An option element may have zero or more doc elements that document the meaning of the value.
  */
-package edu.sjtu.ist.bjggzxb.WadlParser;
+package edu.sjtu.ist.bjggzxb.WadlParser.impl;
 
 import java.util.List;
 import java.util.ArrayList;
 
-public class OptionNode extends GenericNode {
+import edu.sjtu.ist.bjggzxb.WadlParser.core.DocNode;
+import edu.sjtu.ist.bjggzxb.WadlParser.core.OptionNode;
+
+public class OptionNodeImpl extends GenericNodeImpl implements OptionNode{
 
 	private String value;
 	private String mediaType;
 	private List<DocNode> docNodes;
 
-	public OptionNode() {
+	public OptionNodeImpl() {
 		value = null;
 		this.docNodes = new ArrayList<DocNode>();
 	}
@@ -58,8 +61,8 @@ public class OptionNode extends GenericNode {
 
 	@Override
 	public boolean equals(Object other) {
-		if (other instanceof OptionNode) {
-			OptionNode option = (OptionNode) other;
+		if (other instanceof OptionNodeImpl) {
+			OptionNodeImpl option = (OptionNodeImpl) other;
 			if (option.getValue().equals(this.value))
 				return true;
 		}
