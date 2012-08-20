@@ -1,22 +1,12 @@
 package edu.sjtu.ist.bjggzxb.doc;
 
+import com.google.gson.annotations.Since;
+
 public class KeyPair {
 
-	private String from;
-	
-	private String to;
-	
-	public KeyPair(){
-		from = "smaplefrom";
-		to ="sampleto";
-	}
-
-	public String getFrom() {
-		return from;
-	}
-
-	public String getTo() {
-		return to;
-	}
+	@Since(1.0)
+	public String from;
+	@Since(1.0)
+	public String to;
 	
 }

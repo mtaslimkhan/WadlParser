@@ -15,14 +15,4 @@ public class ResourceDoc {
 	public String description;
 	@Since(1.0)
 	public ArrayList<ResourceRelation> relations;
-	
-	public ResourceDoc() {
-		name = "uknown";
-		provider = "uknown";
-		minides = "none";
-		description = "none";
-		relations = new ArrayList<ResourceRelation>();
-		ResourceRelation relation = new ResourceRelation();
-		relations.add(relation);
-	}
 }

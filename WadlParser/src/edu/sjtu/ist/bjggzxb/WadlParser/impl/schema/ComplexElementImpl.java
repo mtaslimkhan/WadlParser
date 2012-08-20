@@ -32,6 +32,7 @@ public class ComplexElementImpl implements ComplexElement {
 		this.name = element.getName();
 		this.max = max;
 		this.min = min;
+		children = new ArrayList<BaseElement>();
 		XSType t = element.getType();
 		if (!t.isComplexType())
 			return;

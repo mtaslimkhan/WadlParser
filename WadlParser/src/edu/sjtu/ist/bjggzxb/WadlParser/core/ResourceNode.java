@@ -3,9 +3,12 @@ package edu.sjtu.ist.bjggzxb.WadlParser.core;
 import java.util.List;
 
 import edu.sjtu.ist.bjggzxb.WadlParser.core.schema.BaseElement;
+import edu.sjtu.ist.bjggzxb.doc.ResourceDoc;
 
 public interface ResourceNode {
 
+	public ResourceDoc getDoc();
+	
 	public String getProvider();
 
 	public String getName();

@@ -319,9 +319,10 @@ public class ResourceNodeImpl extends GenericNodeImpl implements ResourceNode {
 
 	@Override
 	public String getName() {
-		if (docInfo == null)
-			return "uknown";
-		else
+		if (docInfo == null) {
+			String[] strs = path.split("/");
+			return strs[strs.length - 1].toUpperCase();
+		} else
 			return docInfo.name;
 	}
 
@@ -349,5 +350,10 @@ public class ResourceNodeImpl extends GenericNodeImpl implements ResourceNode {
 	@Override
 	public String getId() {
 		return id;
+	}
+
+	@Override
+	public ResourceDoc getDoc() {
+		return docInfo;
 	}
 }

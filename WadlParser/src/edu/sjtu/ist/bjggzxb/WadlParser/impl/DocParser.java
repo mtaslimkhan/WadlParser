@@ -42,7 +42,7 @@ public class DocParser extends SimpleParser {
 					ComplexElementImpl ele = new ComplexElementImpl(decl, 1, 1);
 					resourceNode.elementDecl = ele;
 				}
-				System.out.println(resourceNode.elementDecl.toString(""));
+				// System.out.println(resourceNode.elementDecl.toString(""));
 			}
 		}
 		return resourceNode;

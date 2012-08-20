@@ -81,11 +81,11 @@ import edu.sjtu.ist.bjggzxb.WadlParser.core.ParamNode;
 
 public class ParamNodeImpl extends GenericNodeImpl implements ParamNode{
 
-	public static String MATRIX_TYPE = "matrix";
-	public static String HEADER_TYPE = "header";
-	public static String QUERY_TYPE = "query";
-	public static String TEMPLATE_TYPE = "template";
-	public static String PLAIN_TYPE = "plain";
+	public static String MATRIX_STYLE = "matrix";
+	public static String HEADER_STYLE = "header";
+	public static String QUERY_STYLE = "query";
+	public static String TEMPLATE_STYLE = "template";
+	public static String PLAIN_STYLE = "plain";
 
 	private final boolean href;
 	private final String id;
